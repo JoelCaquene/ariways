@@ -37,40 +37,61 @@ class PlatformBankDetailsAdmin(admin.ModelAdmin):
 
 @admin.register(Deposit)
 class DepositAdmin(admin.ModelAdmin):
-    # Adicionamos 'proof_link' para mostrar o link na lista de depósitos
     list_display = ('user', 'amount', 'is_approved', 'created_at', 'proof_link') 
     search_fields = ('user__phone_number',)
     list_filter = ('is_approved',)
-    
-    # Campos que serão apenas de leitura na página de edição/criação
     readonly_fields = ('current_proof_display',)
 
-    # Método para criar o link do comprovativo na LISTA de depósitos
+    def save_model(self, request, obj, form, change):
+        # Se o depósito está sendo marcado como aprovado agora
+        if change and 'is_approved' in form.changed_data and obj.is_approved:
+            user = obj.user
+            user.available_balance += obj.amount
+            user.save()
+        super().save_model(request, obj, form, change)
+
     def proof_link(self, obj):
         if obj.proof_of_payment:
-            # obj.proof_of_payment.url usa o Cloudinary Storage para obter o URL completo.
             return mark_safe(f'<a href="{obj.proof_of_payment.url}" target="_blank">Ver Comprovativo</a>')
         return "Nenhum"
-        
     proof_link.short_description = 'Comprovativo'
 
-    # Método para exibir a imagem/link na PÁGINA DE EDIÇÃO/MODIFICAÇÃO
     def current_proof_display(self, obj):
         if obj.proof_of_payment:
-            # Exibe a imagem diretamente e fornece um link para visualização
             return mark_safe(f'''
                 <a href="{obj.proof_of_payment.url}" target="_blank">Ver Imagem em Tamanho Real</a><br/>
                 <img src="{obj.proof_of_payment.url}" style="max-width:300px; height:auto; margin-top: 10px;" />
             ''')
         return "Nenhum Comprovativo Carregado"
-    
     current_proof_display.short_description = 'Comprovativo Atual'
 
 @admin.register(Withdrawal)
 class WithdrawalAdmin(admin.ModelAdmin):
-    list_display = ('user', 'amount', 'status', 'created_at')
+    list_display = ('user', 'get_iban', 'amount', 'status', 'created_at')
     search_fields = ('user__phone_number',)
     list_filter = ('status',)
+
+    def get_iban(self, obj):
+        try:
+            return obj.user.bankdetails.IBAN
+        except:
+            return "Não cadastrado"
+    get_iban.short_description = 'IBAN do Cliente'
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        # Define as opções de seleção para o campo status
+        status_choices = [
+            ('Pending', 'Pendente'),
+            ('Approved', 'Aprovado'),
+            ('Rejected', 'Rejeitado'),
+        ]
+        if 'status' in form.base_fields:
+            form.base_fields['status'].widget = admin.widgets.AdminRadioSelect(choices=status_choices) if len(status_choices) < 4 else admin.widgets.AdminTextInputWidget()
+            # Alternativa padrão para Dropdown:
+            from django import forms
+            form.base_fields['status'].widget = forms.Select(choices=status_choices)
+        return form
 
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
@@ -92,5 +113,4 @@ class UserLevelAdmin(admin.ModelAdmin):
     list_display = ('user', 'level', 'purchase_date', 'is_active')
     search_fields = ('user__phone_number', 'level__name')
     list_filter = ('is_active',)
-
-# ---
+    
