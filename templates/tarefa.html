@@ -1,399 +1,316 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Forex Mining - Trading Terminal{% endblock %}
+{% block title %}Airways - Terminal de Decolagem{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 
-<div class="forex-terminal">
-    {# A. HEADER PROFISSIONAL #}
-    <div class="terminal-header">
-        <div class="status-indicator">
-            <span class="live-dot"></span>
-            <span class="status-text">LIVE MARKET DATA</span>
-        </div>
-        <div class="market-info">
-            <span class="pair">EUR/USD <i class="fa-solid fa-chart-line"></i></span>
-            <span class="price" id="live-price">1.08420</span>
-        </div>
+<div class="aviator-terminal">
+    {# HEADER SIMPLES #}
+    <div class="aviator-header">
+        <a href="{% url 'menu' %}" class="back-link"><i class="fa-solid fa-arrow-left"></i></a>
+        <div class="logo-text">AIRWAYS <span>TERMINAL</span></div>
+        <div class="user-badge"><i class="fa-solid fa-circle-user"></i></div>
     </div>
 
     {% if not has_active_level %}
-    {# B. ESTADO BLOQUEADO (NÍVEL INATIVO) #}
-    <div class="locked-container">
-        <div class="lock-card">
-            <i class="fa-solid fa-shield-halved lock-icon"></i>
-            <h2>Terminal Desconectado</h2>
-            <p>Seu acesso ao mercado global está restrito. Adquira um plano de mineração para iniciar operações.</p>
-            <div class="alert-box">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-                <span>STATUS: NÃO TENS AUTORIZAÇÃO, CONTACTA PRIMEIRO ADMINISTRADOR</span>
-            </div>
+    {# ESTADO BLOQUEADO #}
+    <div class="locked-screen">
+        <div class="lock-info">
+            <i class="fa-solid fa-plane-slash"></i>
+            <h2>SEM AERONAVE</h2>
+            <p>Ative um plano na frota para começar a voar.</p>
         </div>
     </div>
     {% else %}
-        
-        {# C. AREA DE ANALISE (GRAFICOS) #}
-        <div class="analysis-section">
-            <div id="chart-timeline"></div>
+
+    {# O JOGO - ESTILO AVIATOR #}
+    <div class="game-container">
+        <div class="game-screen" id="main-screen">
+            {# O AVIÃO QUE VAI VOAR #}
+            <div class="plane-box" id="airplane">
+                <i class="fa-solid fa-plane"></i>
+                <div class="plane-trail"></div>
+            </div>
+
+            {# MULTIPLICADOR/MENSAGEM #}
+            <div class="display-data">
+                <h1 id="multiplier-text">PRONTO</h1>
+                <p id="sub-text">Aguardando autorização...</p>
+            </div>
+
+            {# LINHAS DO GRÁFICO (EFEITO AVIATOR) #}
+            <svg class="graph-svg">
+                <path id="graph-path" d="M0,200 Q150,200 300,200" fill="none" stroke="#e11d48" stroke-width="4" />
+            </svg>
         </div>
 
-        {# D. CONTAINER DE MINERAÇÃO (A TAREFA) #}
-        <div class="mining-card">
-            <div class="mining-stats">
-                <div class="stat-item">
-                    <span class="label">VOLATILIDADE</span>
-                    <span class="value high">ALTA</span>
-                </div>
-                <div class="stat-item">
-                    <span class="label">CONEXÃO</span>
-                    <span class="value secure">ENCRIPTADA</span>
-                </div>
+        {# ÁREA DO BOTÃO #}
+        <div class="action-panel">
+            <div id="sunday-notice" class="notice-box" style="display: none;">
+                <i class="fa-solid fa-calendar-xmark"></i>
+                <p>MERCADO FECHADO AOS DOMINGOS</p>
             </div>
 
-            <div class="display-screen">
-                <div class="scan-line"></div>
-                <div id="sunday-notice" style="display: none; color: #ffcc00; padding: 10px;">
-                    <i class="fa-solid fa-calendar-day" style="font-size: 20px; margin-bottom: 10px;"></i><br>
-                    <strong style="color: #fff;">AVISO DE MERCADO</strong><br>
-                    <small>Caro investidor, hoje é domingo. A tarefa é de segunda a sábado. Hoje o serviço disponível é apenas depósito. Obrigado.</small>
-                </div>
-                <p id="task-message">SISTEMA PRONTO PARA MINERAÇÃO FOREX</p>
-                <div class="progress-container" id="progress-bar-container" style="display: none;">
-                    <div class="progress-fill" id="progress-fill"></div>
-                </div>
-            </div>
-
-            <div class="control-panel">
-                <div class="status-lights">
-                    <div class="light" id="light-red" title="Aguardando"></div>
-                    <div class="light" id="light-yellow" title="Processando"></div>
-                    <div class="light" id="light-green" title="Concluído"></div>
-                </div>
-                
-                <button id="work-button" class="mining-btn">
-                    <i class="fa-solid fa-microchip"></i> 
-                    <span>MINERAÇÃO FOREX</span>
-                </button>
-            </div>
+            <button id="work-button" class="fly-btn">
+                <span>DECOLAR</span>
+                <small>INICIAR VIAGEM AGORA</small>
+            </button>
         </div>
+    </div>
 
-        {# E. MENSAGENS DJANGO #}
-        {% if messages %}
-            {% for message in messages %}
-                <div class="toast-message {{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const btn = document.getElementById('work-button');
+            const plane = document.getElementById('airplane');
+            const multText = document.getElementById('multiplier-text');
+            const subText = document.getElementById('sub-text');
+            const path = document.getElementById('graph-path');
+            const sundayNotice = document.getElementById('sunday-notice');
 
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                // --- LÓGICA DO GRÁFICO ---
-                var options = {
-                    series: [{ data: [] }],
-                    chart: {
-                        type: 'area',
-                        height: 200,
-                        toolbar: { show: false },
-                        animations: { enabled: true, easing: 'linear', dynamicAnimation: { speed: 1000 } }
-                    },
-                    colors: ['#00ff88'],
-                    fill: {
-                        type: 'gradient',
-                        gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05 }
-                    },
-                    dataLabels: { enabled: false },
-                    stroke: { curve: 'smooth', width: 2 },
-                    xaxis: { labels: { show: false }, axisBorder: { show: false } },
-                    yaxis: { labels: { show: false } },
-                    grid: { borderColor: '#1a2637' }
-                };
+            let tasksCompletedToday = {{ tasks_completed_today|default:0 }};
+            let maxTasks = {{ max_tasks|default:1 }};
+            const isSunday = new Date().getDay() === 0;
 
-                var chart = new ApexCharts(document.querySelector("#chart-timeline"), options);
-                chart.render();
+            if (isSunday) {
+                btn.style.display = 'none';
+                sundayNotice.style.display = 'block';
+                multText.textContent = "OFFLINE";
+                multText.style.color = "#444";
+                return;
+            }
 
-                function updateChart() {
-                    let newData = [];
-                    for(let i=0; i<15; i++) {
-                        newData.push(Math.floor(Math.random() * (100 - 40) + 40));
-                    }
-                    chart.updateSeries([{ data: newData }]);
-                    const price = (1.08 + Math.random() * 0.01).toFixed(5);
-                    document.getElementById('live-price').innerText = price;
-                }
-                setInterval(updateChart, 3000);
-                updateChart();
+            if (tasksCompletedToday >= maxTasks) {
+                setCompletedUI();
+            }
 
-                // --- LÓGICA DE TAREFAS E BLOQUEIO DE DOMINGO ---
-                const workButton = document.getElementById('work-button');
-                const taskMessage = document.getElementById('task-message');
-                const sundayNotice = document.getElementById('sunday-notice');
-                const lightRed = document.getElementById('light-red');
-                const lightYellow = document.getElementById('light-yellow');
-                const lightGreen = document.getElementById('light-green');
-                const progressContainer = document.getElementById('progress-bar-container');
-                const progressFill = document.getElementById('progress-fill');
+            function setCompletedUI() {
+                btn.disabled = true;
+                btn.innerHTML = "<span>CONCLUÍDO</span><small>LIMITE DIÁRIO ATINGIDO</small>";
+                btn.style.background = "#1a1a1a";
+                multText.textContent = "SUCESSO";
+                multText.style.color = "#00ff88";
+                subText.textContent = "Viagem finalizada com lucro";
+            }
 
-                let tasksCompletedToday = {{ tasks_completed_today|default:0 }}; 
-                let maxTasks = {{ max_tasks|default:1 }};
+            btn.addEventListener('click', function() {
+                // Iniciar Animação estilo Aviator
+                btn.disabled = true;
+                btn.style.opacity = "0.5";
+                multText.textContent = "1.00x";
+                multText.style.color = "#fff";
+                subText.textContent = "Subindo altitude...";
                 
-                // VERIFICAÇÃO DE DOMINGO
-                const today = new Date();
-                const isSunday = today.getDay() === 0;
+                // Animação do Avião
+                plane.classList.add('flying');
+                
+                // Simulação do Multiplicador subindo
+                let val = 1.00;
+                let counter = setInterval(() => {
+                    val += 0.05;
+                    if(val >= 2.50) clearInterval(counter);
+                    else multText.textContent = val.toFixed(2) + "x";
+                }, 100);
 
-                function updateUI(status) {
-                    lightRed.className = 'light';
-                    lightYellow.className = 'light';
-                    lightGreen.className = 'light';
-
-                    if (status === 'idle') {
-                        lightRed.classList.add('red', 'pulse');
-                        workButton.disabled = false;
-                    } else if (status === 'working') {
-                        lightYellow.classList.add('yellow', 'blink');
-                        workButton.disabled = true;
-                    } else if (status === 'done') {
-                        lightGreen.classList.add('green', 'glow');
-                        workButton.disabled = true;
-                        workButton.innerHTML = '<i class="fa-solid fa-check"></i> OPERAÇÃO FINALIZADA';
-                    } else if (status === 'sunday') {
-                        workButton.disabled = true;
-                        workButton.style.opacity = "0.5";
-                        workButton.style.filter = "grayscale(1)";
-                        workButton.innerHTML = '<i class="fa-solid fa-ban"></i> MERCADO FECHADO';
-                        taskMessage.style.display = 'none';
-                        sundayNotice.style.display = 'block';
-                    }
-                }
-
-                function checkStatus() {
-                    if (isSunday) {
-                        updateUI('sunday');
-                    } else if (tasksCompletedToday >= maxTasks) {
-                        taskMessage.textContent = "LIMITE DIÁRIO ALCANÇADO";
-                        updateUI('done');
-                    } else {
-                        updateUI('idle');
-                    }
-                }
-
-                if (workButton && !isSunday) {
-                    workButton.addEventListener('click', function() {
-                        if (tasksCompletedToday < maxTasks) {
-                            updateUI('working');
-                            taskMessage.textContent = "SINCRONIZANDO...";
-                            progressContainer.style.display = 'block';
-                            
-                            let width = 0;
-                            let interval = setInterval(() => {
-                                if(width >= 100) clearInterval(interval);
-                                else {
-                                    width += 2;
-                                    progressFill.style.width = width + '%';
-                                }
-                            }, 50);
-
-                            fetch("{% url 'process_task' %}", {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRFToken': '{{ csrf_token }}'
-                                }
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                setTimeout(() => {
-                                    if (data.success) {
-                                        tasksCompletedToday++;
-                                        taskMessage.innerHTML = `<span style="color: #00ff88">LUCRO: KZ ${data.daily_gain}</span>`;
-                                    } else {
-                                        taskMessage.textContent = data.message || "ERRO";
-                                    }
-                                    progressContainer.style.display = 'none';
-                                    progressFill.style.width = '0%';
-                                    checkStatus();
-                                }, 2500);
-                            })
-                            .catch(error => {
-                                taskMessage.textContent = "CONEXÃO INTERROMPIDA";
-                                updateUI('idle');
-                            });
+                // Chamada para o Servidor
+                fetch("{% url 'process_task' %}", {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json' }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    setTimeout(() => {
+                        if (data.success) {
+                            multText.textContent = "VOO OK";
+                            multText.style.color = "#00ff88";
+                            subText.innerHTML = `<span style="color:#00ff88; font-weight:bold;">LUCRO: KZ ${data.daily_gain}</span>`;
+                            setTimeout(setCompletedUI, 2000);
+                        } else {
+                            alert(data.message);
+                            location.reload();
                         }
-                    });
-                }
-                checkStatus();
+                    }, 3000);
+                })
+                .catch(() => {
+                    multText.textContent = "ERRO";
+                    plane.classList.remove('flying');
+                    btn.disabled = false;
+                });
             });
-        </script>
+        });
+    </script>
     {% endif %}
 </div>
 
 <style>
     :root {
-        --bg-dark: #0a0f18;
-        --card-dark: #121926;
-        --accent-green: #00ff88;
-        --accent-yellow: #ffcc00;
-        --accent-red: #ff4d4d;
-        --text-main: #ffffff;
-        --text-dim: #8492a6;
+        --primary: #e11d48; /* Vermelho Aviator */
+        --bg: #0f1116;
+        --card: #1b1d26;
+        --text: #ffffff;
+        --green: #00ff88;
     }
 
     body {
-        background-color: var(--bg-dark);
+        background: url("{% static 'images/background_airways.jpg' %}") no-repeat center center fixed;
+        background-size: cover;
         font-family: 'Inter', sans-serif;
+        color: var(--text);
         margin: 0;
-        padding: 0;
-        color: var(--text-main);
-        overflow-x: hidden;
     }
 
-    .forex-terminal {
+    .aviator-terminal {
         width: 100%;
-        max-width: 480px;
+        max-width: 450px;
         margin: 0 auto;
-        padding: 10px;
+        min-height: 100vh;
+        background: rgba(15, 17, 22, 0.92);
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
         box-sizing: border-box;
     }
 
-    .terminal-header {
+    /* HEADER */
+    .aviator-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: var(--card-dark);
-        padding: 12px;
-        border-radius: 12px;
-        border: 1px solid #1e293b;
-        margin-bottom: 12px;
+        padding: 10px 5px;
+        margin-bottom: 20px;
     }
+    .logo-text { font-weight: 900; letter-spacing: -1px; font-size: 18px; }
+    .logo-text span { color: var(--primary); }
+    .back-link { color: #fff; font-size: 20px; text-decoration: none; }
 
-    .status-indicator {
+    /* GAME SCREEN */
+    .game-container {
+        flex-grow: 1;
         display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 9px;
-        font-weight: 800;
-        letter-spacing: 0.5px;
+        flex-direction: column;
+        gap: 15px;
     }
 
-    .live-dot {
-        width: 7px;
-        height: 7px;
-        background: var(--accent-red);
-        border-radius: 50%;
-        animation: pulse-red 1.5s infinite;
-    }
-
-    .market-info .pair { font-size: 11px; font-weight: bold; color: var(--text-dim); }
-    .market-info .price { font-family: 'JetBrains Mono', monospace; color: var(--accent-green); font-size: 12px; }
-
-    .analysis-section {
-        background: var(--card-dark);
-        border-radius: 12px;
-        padding: 5px;
-        margin-bottom: 12px;
-        border: 1px solid #1e293b;
-    }
-
-    .mining-card {
-        background: var(--card-dark);
+    .game-screen {
+        height: 300px;
+        background: #000;
         border-radius: 15px;
-        padding: 15px;
-        border: 1px solid #1e293b;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-
-    .mining-stats {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 15px;
-    }
-
-    .stat-item .label { font-size: 8px; color: var(--text-dim); }
-    .stat-item .value { font-size: 11px; font-weight: bold; }
-
-    .display-screen {
-        background: #05070a;
-        border-radius: 8px;
-        padding: 25px 10px;
-        text-align: center;
         position: relative;
         overflow: hidden;
-        border: 1px solid #1e293b;
-        margin-bottom: 15px;
-        min-height: 80px;
+        border: 2px solid #2d303a;
         display: flex;
         align-items: center;
         justify-content: center;
-        flex-direction: column;
     }
 
-    .scan-line {
+    .display-data {
+        text-align: center;
+        z-index: 10;
+    }
+    .display-data h1 {
+        font-size: 48px;
+        margin: 0;
+        font-weight: 900;
+        text-shadow: 0 0 20px rgba(225, 29, 72, 0.5);
+    }
+    .display-data p {
+        color: #888;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+
+    /* AVIÃO E ANIMAÇÃO */
+    .plane-box {
         position: absolute;
-        top: 0; left: 0; width: 100%; height: 2px;
-        background: rgba(0, 255, 136, 0.2);
-        animation: scan 3s infinite linear;
+        bottom: 20px;
+        left: 20px;
+        font-size: 40px;
+        color: var(--primary);
+        z-index: 5;
+        transition: 3s cubic-bezier(0.5, 0, 0.5, 1);
+        transform: rotate(-10deg);
     }
 
-    #task-message, #sunday-notice small {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 13px;
+    .plane-box.flying {
+        transform: translate(300px, -200px) rotate(-35deg);
     }
 
-    .progress-container {
+    .plane-trail {
+        position: absolute;
+        width: 100px;
+        height: 2px;
+        background: linear-gradient(to left, var(--primary), transparent);
+        right: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0;
+    }
+    .flying .plane-trail { opacity: 1; }
+
+    /* BOTÃO PRINCIPAL */
+    .action-panel {
+        background: var(--card);
+        padding: 20px;
+        border-radius: 20px;
+        border: 1px solid #2d303a;
+    }
+
+    .fly-btn {
         width: 100%;
-        height: 4px;
-        background: #1a2637;
-        margin-top: 12px;
-        border-radius: 2px;
-    }
-    .progress-fill {
-        height: 100%;
-        background: var(--accent-green);
-        box-shadow: 0 0 10px var(--accent-green);
-    }
-
-    .status-lights {
-        display: flex;
-        gap: 12px;
-        margin-bottom: 15px;
-        justify-content: center;
-    }
-
-    .light {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: #232d3d;
-    }
-
-    .light.red { background: var(--accent-red); box-shadow: 0 0 10px var(--accent-red); }
-    .light.yellow { background: var(--accent-yellow); box-shadow: 0 0 10px var(--accent-yellow); }
-    .light.green { background: var(--accent-green); box-shadow: 0 0 10px var(--accent-green); }
-
-    .mining-btn {
-        width: 100%;
-        padding: 16px;
-        border-radius: 10px;
+        background: #28a745; /* Verde BantuBet */
         border: none;
-        background: linear-gradient(135deg, #00ff88 0%, #00bd65 100%);
-        color: #000;
-        font-weight: 800;
-        font-size: 15px;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-
-    .lock-card {
-        background: var(--card-dark);
         padding: 20px;
         border-radius: 15px;
-        text-align: center;
-        border: 1px dashed #334155;
+        color: white;
+        cursor: pointer;
+        transition: 0.3s;
+        box-shadow: 0 5px 0 #1e7e34;
     }
 
-    @keyframes pulse-red { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-    @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+    .fly-btn:active { transform: translateY(3px); box-shadow: none; }
+
+    .fly-btn span {
+        display: block;
+        font-size: 22px;
+        font-weight: 900;
+    }
+    .fly-btn small {
+        opacity: 0.8;
+        font-size: 11px;
+    }
+
+    .notice-box {
+        background: rgba(255, 204, 0, 0.1);
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        color: #ffcc00;
+        border: 1px solid #ffcc00;
+    }
+
+    /* ESTADO BLOQUEADO */
+    .locked-screen {
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background: rgba(0,0,0,0.5);
+        border-radius: 20px;
+    }
+    .lock-info i { font-size: 60px; color: #444; margin-bottom: 15px; }
+
+    /* SVG DO GRÁFICO */
+    .graph-svg {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        pointer-events: none;
+    }
 </style>
 {% endblock %}

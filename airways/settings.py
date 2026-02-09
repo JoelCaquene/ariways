@@ -1,5 +1,5 @@
 """
-Django settings for ibkr project.
+Django settings for airways project.
 """
 
 from pathlib import Path
@@ -54,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'ibkr.urls'
+ROOT_URLCONF = 'airways.urls'
 
 TEMPLATES = [
     {
@@ -72,7 +72,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ibkr.wsgi.application'
+WSGI_APPLICATION = 'airways.wsgi.application'
 
 # ======================================================================
 # DATABASE

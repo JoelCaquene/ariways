@@ -1,362 +1,215 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}IBKR - Forex Mining Terminal{% endblock %}
+{% block title %}airways - Dashboard Principal{% endblock %}
 
 {% block content %}
 <div id="welcomeModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <div class="brand-logo-pop">IBKR</div>
-            <h2>Bem-vindo à Revolução Forex</h2>
-        </div>
-        <div class="modal-body">
-            <p class="intro-p">A <strong>IBKR</strong> é uma empresa líder em operações online no mercado Forex.</p>
+    <div class="modal-content glass-modal">
+        <span class="close-x" onclick="closeModal()">&times;</span>
+        <div class="modal-scroll-area">
+            <h3 class="modal-title-simple">SEJA BEM-VINDO</h3>
+            <p class="modal-text-simple">PARA OBTER INFORMAÇÕES E SUPORTE ENTRE NO GRUPO DO WHATSAPP.</p>
             
-            <div class="benefits-list">
-                <p>Após o seu depósito de garantia, você terá acesso a:</p>
-                <div class="benefit-item">
-                    <i class="fas fa-file-contract"></i>
-                    <span>1. Seu Certificado de Investimento Oficial</span>
-                </div>
-                <div class="benefit-item">
-                    <i class="fas fa-credit-card"></i>
-                    <span>2. Seu Cartão de Uso Pessoal Exclusivo</span>
-                </div>
-                <div class="benefit-item">
-                    <i class="fas fa-tshirt"></i>
-                    <span>3. Uma Camisa Oficial da Equipa IBKR</span>
-                </div>
-            </div>
-
-            <div class="support-area">
-                <p>Para mais informações, visite nosso canal oficial:</p>
-                <a href="{{ whatsapp_link }}" target="_blank" class="btn-whatsapp-pop">
-                    <i class="fab fa-whatsapp"></i> CANAL DE APOIO IBKR
-                </a>
-            </div>
+            <a href="{{ whatsapp_link }}" target="_blank" class="btn-whatsapp-link">
+                <i class="fa-brands fa-whatsapp"></i> ENTRAR NO GRUPO
+            </a>
+            
+            <button class="btn-just-close" onclick="closeModal()">FECHAR</button>
         </div>
-        <button class="btn-close-modal" onclick="closeModal()">Entendido</button>
     </div>
 </div>
 
 <div class="forex-dashboard">
+    <div class="carousel-container">
+        <div class="carousel-slider" id="slider">
+            <div class="slide"><img src="{% static 'images/banner1.jpg' %}" alt="Banner 1"></div>
+            <div class="slide"><img src="{% static 'images/banner2.jpg' %}" alt="Banner 2"></div>
+            <div class="slide"><img src="{% static 'images/banner3.jpg' %}" alt="Banner 3"></div>
+            <div class="slide"><img src="{% static 'images/banner4.jpg' %}" alt="Banner 4"></div>
+            <div class="slide"><img src="{% static 'images/banner5.jpg' %}" alt="Banner 5"></div>
+        </div>
+        <div class="carousel-dots" id="dots"></div>
+    </div>
 
-    {# 1. Banner Superior #}
-    <div class="trading-header">
-        <div class="forex-chart-bg">
-            <div class="chart-overlay">
-                <h1 class="brand-title">IBKR</h1>
-                <p class="brand-subtitle">SMART FOREX TRADING</p>
-            </div>
+    <div class="marquee-wrapper">
+        <div class="marquee-content">
+            <i class="fa-solid fa-plane-up"></i> Qatar Airways: Frequentemente eleita a melhor companhia aérea do mundo. É conhecida pelo luxo extremo e por conectar o ocidente ao oriente via Doha.
         </div>
     </div>
 
-    {# 2. Botões de Ação Rápida #}
     <div class="action-grid">
-        <a href="{% url 'deposito' %}" class="action-btn btn-blue">
-            <i class="fas fa-wallet"></i>
-            <span>Depósito</span>
+        <a href="{% url 'deposito' %}" class="action-btn">
+            <div class="icon-box bg-glow"><i class="fa-solid fa-vault"></i></div>
+            <span class="btn-label">Depósito</span>
         </a>
-        <a href="{% url 'tarefa' %}" class="action-btn btn-teal">
-            <i class="fas fa-tasks"></i>
-            <span>Missão</span>
+        <a href="{% url 'tarefa' %}" class="action-btn">
+            <div class="icon-box bg-glow"><i class="fa-solid fa-rocket"></i></div>
+            <span class="btn-label">Missão</span>
         </a>
-        <a href="{% url 'roleta' %}" class="action-btn btn-yellow">
-            <i class="fas fa-clover"></i>
-            <span>Roleta</span>
+        <a href="{% url 'roleta' %}" class="action-btn">
+            <div class="icon-box bg-glow"><i class="fa-solid fa-dharmachakra"></i></div>
+            <span class="btn-label">Roleta</span>
         </a>
-        <a href="{% url 'sobre' %}" class="action-btn btn-purple">
-            <i class="fas fa-info-circle"></i>
-            <span>Sobre</span>
+        <a href="{% url 'renda' %}" class="action-btn">
+            <div class="icon-box bg-glow"><i class="fa-solid fa-gem"></i></div>
+            <span class="btn-label">Renda</span>
         </a>
     </div>
 
-    {# 3. Lista de Moedas Estilo Binance #}
-    <div class="market-section">
-        <div class="market-header-list">
-            <span>Par de Moedas</span>
-            <span>Preço Live</span>
-            <span>24h %</span>
-        </div>
-        
-        <div class="crypto-list">
-            <div class="crypto-item">
-                <div class="coin-info">
-                    <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" width="20">
-                    <div><strong>BTC</strong>/USDT</div>
-                </div>
-                <div class="coin-price" id="btc-price">43,120.50</div>
-                <div class="coin-change pos">+2.45%</div>
-            </div>
-
-            <div class="crypto-item">
-                <div class="coin-info">
-                    <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" width="20">
-                    <div><strong>ETH</strong>/USDT</div>
-                </div>
-                <div class="coin-price" id="eth-price">2,245.10</div>
-                <div class="coin-change pos">+1.12%</div>
-            </div>
-
-            <div class="crypto-item">
-                <div class="coin-info">
-                    <img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" width="20">
-                    <div><strong>BNB</strong>/USDT</div>
-                </div>
-                <div class="coin-price" id="bnb-price">312.45</div>
-                <div class="coin-change neg">-0.54%</div>
-            </div>
-
-            <div class="crypto-item">
-                <div class="coin-info">
-                    <img src="https://cryptologos.cc/logos/solana-sol-logo.png" width="20">
-                    <div><strong>SOL</strong>/USDT</div>
-                </div>
-                <div class="coin-price" id="sol-price">98.22</div>
-                <div class="coin-change pos">+5.80%</div>
-            </div>
-            
-            <div class="crypto-item">
-                <div class="coin-info">
-                    <img src="https://cryptologos.cc/logos/xrp-xrp-logo.png" width="20">
-                    <div><strong>XRP</strong>/USDT</div>
-                </div>
-                <div class="coin-price">0.5241</div>
-                <div class="coin-change neg">-1.20%</div>
-            </div>
-        </div>
+    <div class="brand-info-section">
+        <p>Negociações Inteligentes <span>•</span> Airways Terminal</p>
     </div>
-
 </div>
 
-{# 4. Barra de Navegação Inferior #}
 <nav class="trading-nav">
     <a href="{% url 'home' %}" class="nav-link active">
-        <i class="fas fa-home"></i>
+        <i class="fa-solid fa-house-user"></i>
         <span>Início</span>
     </a>
     <a href="{% url 'nivel' %}" class="nav-link">
-        <i class="fas fa-bolt"></i>
+        <i class="fa-solid fa-award"></i>
         <span>Nível</span>
     </a>
-    <a href="{% url 'renda' %}" class="nav-link">
-        <i class="fas fa-chart-line"></i>
-        <span>Renda</span>
+    <a href="{% url 'saque' %}" class="nav-link">
+        <i class="fa-solid fa-wallet"></i> 
+        <span>Saque</span>
     </a>
     <a href="{% url 'equipa' %}" class="nav-link">
-        <i class="fas fa-users"></i>
+        <i class="fa-solid fa-users-rays"></i>
         <span>Equipa</span>
     </a>
     <a href="{% url 'perfil' %}" class="nav-link">
-        <i class="fas fa-user-cog"></i>
+        <i class="fa-solid fa-id-card-clip"></i>
         <span>Perfil</span>
     </a>
 </nav>
 
 <style>
     :root {
-        --bg-dark: #060d17;
-        --card-dark: #121b28;
-        --accent-blue: #00a8ff;
-        --accent-green: #00ff88;
-        --accent-red: #ff4d4d;
-        --text-gray: #8a94a6;
+        --primary-green: #00c853;
+        --bright-grey: #e0e0e0;
+        --glow-color: rgba(255, 255, 255, 0.4);
     }
 
-    /* ESTILOS DO POP-UP (MODAL) */
-    .modal-overlay {
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0, 0, 0, 0.85);
-        display: flex; justify-content: center; align-items: center;
-        z-index: 9999;
-        backdrop-filter: blur(5px);
-    }
-
-    .modal-content {
-        background: #fff;
-        width: 90%;
-        max-width: 350px;
-        border-radius: 20px;
-        padding: 25px;
-        text-align: center;
-        color: #333;
-        animation: slideUp 0.4s ease-out;
-    }
-
-    @keyframes slideUp {
-        from { transform: translateY(50px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-    }
-
-    .brand-logo-pop {
-        background: #00004d;
-        color: white;
-        display: inline-block;
-        padding: 5px 15px;
-        border-radius: 8px;
-        font-weight: 900;
-        margin-bottom: 10px;
-    }
-
-    .modal-header h2 { font-size: 1.3rem; color: #00004d; margin-bottom: 15px; }
-    .intro-p { font-size: 0.9rem; margin-bottom: 15px; line-height: 1.4; }
-
-    .benefits-list {
-        text-align: left;
-        background: #f8f9fa;
-        padding: 15px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-    }
-
-    .benefits-list p { font-weight: bold; font-size: 0.85rem; margin-bottom: 10px; color: #000; }
-
-    .benefit-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 8px;
-        font-size: 0.85rem;
-    }
-
-    .benefit-item i { color: #4CAF50; width: 20px; }
-
-    .btn-whatsapp-pop {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        background: #25d366;
-        color: white;
-        text-decoration: none;
-        padding: 12px;
-        border-radius: 10px;
-        font-weight: bold;
-        font-size: 0.9rem;
-        transition: 0.3s;
-    }
-
-    .btn-close-modal {
-        margin-top: 15px;
-        background: #eee;
-        border: none;
-        padding: 8px 20px;
-        border-radius: 5px;
-        color: #666;
-        cursor: pointer;
-        font-weight: bold;
-    }
-
-    /* ESTILOS ORIGINAIS DO DASHBOARD */
     body {
-        background-color: var(--bg-dark) !important;
-        color: white !important;
-        font-family: 'Segoe UI', sans-serif;
+        background: url("{% static 'images/background_airways.jpg' %}") center center fixed;
+        background-size: cover;
         margin: 0;
+        font-family: 'Poppins', sans-serif;
+        color: white;
         padding-bottom: 90px;
     }
 
-    .trading-header {
-        position: relative;
-        height: 160px;
-        background: #000;
+    /* CARROSSEL */
+    .carousel-container {
+        width: 100%; height: 180px; position: relative; overflow: hidden;
+        box-shadow: 0 8px 15px rgba(0,0,0,0.4);
     }
+    .carousel-slider { display: flex; width: 500%; height: 100%; transition: transform 0.8s ease; }
+    .slide { width: 20%; height: 100%; }
+    .slide img { width: 100%; height: 100%; object-fit: cover; }
+    .carousel-dots { position: absolute; bottom: 8px; width: 100%; display: flex; justify-content: center; gap: 5px; }
+    .dot { width: 6px; height: 6px; background: rgba(255,255,255,0.3); border-radius: 50%; }
+    .dot.active { background: var(--primary-green); width: 15px; border-radius: 10px; }
 
-    .forex-chart-bg {
-        width: 100%; height: 100%;
-        background-image: url('https://img.freepik.com/free-vector/trading-chart-blue-background-with-financial-data_1017-31741.jpg');
-        background-size: cover; background-position: center;
-        opacity: 0.5;
-    }
+    /* LETREIRO */
+    .marquee-wrapper { background: rgba(0, 0, 0, 0.6); padding: 10px 0; margin-bottom: 15px; overflow: hidden; white-space: nowrap; }
+    .marquee-content { display: inline-block; padding-left: 100%; animation: marquee 25s linear infinite; font-size: 13px; color: #fff; }
+    @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
 
-    .chart-overlay {
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background: linear-gradient(180deg, transparent 0%, var(--bg-dark) 100%);
-        display: flex; flex-direction: column; justify-content: center; align-items: center;
-    }
-
-    .brand-title { font-size: 38px; font-weight: 900; letter-spacing: 5px; margin: 0; color: #fff; }
-    .brand-subtitle { font-size: 10px; color: var(--accent-blue); letter-spacing: 3px; }
-
-    .action-grid {
-        display: grid; 
-        grid-template-columns: repeat(4, 1fr);
-        gap: 12px; 
-        padding: 20px 15px;
-        position: relative;
-        z-index: 10;
-    }
-    
-    .action-btn {
-        aspect-ratio: 1/1; 
-        border-radius: 15px;
+    /* BOTÕES COM BRILHO CINZA ACESO */
+    .action-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 0 12px; }
+    .action-btn { text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .icon-box.bg-glow { 
+        width: 52px; 
+        height: 52px; 
+        border-radius: 14px; 
         display: flex; 
-        flex-direction: column; 
         align-items: center; 
-        justify-content: center;
-        text-decoration: none; 
+        justify-content: center; 
+        font-size: 20px; 
+        background: var(--bright-grey); 
+        color: #333;
+        box-shadow: 0 0 15px var(--glow-color);
+        border: 1px solid #fff;
+    }
+    .btn-label { font-size: 11px; font-weight: 700; color: #ffffff; text-shadow: 1px 1px 2px #000; text-transform: uppercase; }
+
+    /* MODAL GLASSMORPHISM (EFEITO VIDRO) */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 2000; }
+    .glass-modal { 
+        background: rgba(255, 255, 255, 0.2); 
+        backdrop-filter: blur(15px); 
+        -webkit-backdrop-filter: blur(15px);
+        width: 250px; 
+        max-height: 320px; 
+        padding: 20px; 
+        border-radius: 25px; 
+        text-align: center; 
         color: white; 
-        font-size: 11px; 
-        font-weight: bold;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        position: relative;
+        border: 1px solid rgba(255, 255, 255, 0.3); 
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        overflow: hidden;
     }
+    .modal-scroll-area {
+        max-height: 280px;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+    .close-x { position: absolute; top: 10px; right: 15px; font-size: 20px; font-weight: bold; cursor: pointer; color: rgba(255,255,255,0.7); z-index: 10; }
+    .modal-title-simple { font-size: 16px; font-weight: 800; margin-bottom: 10px; color: #fff; letter-spacing: 1px; }
+    .modal-text-simple { font-size: 12px; margin-bottom: 15px; line-height: 1.4; color: rgba(255,255,255,0.9); }
     
-    .action-btn i { font-size: 22px; margin-bottom: 6px; }
-    .btn-blue { background: #0097e6; }
-    .btn-teal { background: #00cbcb; }
-    .btn-yellow { background: #ffc107; }
-    .btn-purple { background: #8e44ad; }
+    .btn-whatsapp-link {
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        background: #25D366; color: white; text-decoration: none;
+        padding: 12px; border-radius: 12px; font-weight: 700; font-size: 13px; margin-bottom: 10px;
+        box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+        transition: transform 0.2s;
+    }
+    .btn-whatsapp-link:active { transform: scale(0.95); }
 
-    .market-section { margin-top: 10px; padding: 0 15px; }
-    .market-header-list {
-        display: flex; justify-content: space-between;
-        padding: 10px 5px; font-size: 11px; color: var(--text-gray);
-        border-bottom: 1px solid #1e2a3a;
+    .btn-just-close {
+        background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); width: 100%; padding: 10px; border-radius: 12px;
+        color: #fff; font-weight: 600; cursor: pointer; font-size: 11px;
     }
-    .crypto-item {
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 15px 5px; border-bottom: 1px solid #121b28;
-    }
-    .coin-info { display: flex; align-items: center; gap: 10px; font-size: 13px; }
-    .coin-price { font-family: monospace; font-weight: bold; font-size: 14px; }
-    .coin-change {
-        padding: 5px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; min-width: 65px; text-align: center;
-    }
-    .pos { background: rgba(0, 255, 136, 0.1); color: var(--accent-green); }
-    .neg { background: rgba(255, 77, 77, 0.1); color: var(--accent-red); }
 
-    .trading-nav {
-        position: fixed; bottom: 0; width: 100%; height: 75px;
-        background: #0a1420; border-top: 1px solid #1e2a3a;
-        display: flex; justify-content: space-around; align-items: center; z-index: 1000;
-    }
-    .nav-link {
-        text-decoration: none; color: #576574;
-        display: flex; flex-direction: column; align-items: center; font-size: 10px;
-    }
-    .nav-link i { font-size: 22px; margin-bottom: 4px; }
-    .nav-link.active { color: #00a8ff; }
+    /* NAV */
+    .trading-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #0a0f14; display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
+    .nav-link { text-decoration: none; color: #888; display: flex; flex-direction: column; align-items: center; }
+    .nav-link.active { color: var(--primary-green); }
+    .nav-link span { font-size: 10px; font-weight: 600; }
+    .brand-info-section { margin-top: 30px; text-align: center; font-size: 11px; opacity: 0.7; }
+
+    /* Custom Scrollbar */
+    .modal-scroll-area::-webkit-scrollbar { width: 3px; }
+    .modal-scroll-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 10px; }
 </style>
 
 <script>
-    // Função para fechar o Pop-up
-    function closeModal() {
-        document.getElementById('welcomeModal').style.display = 'none';
-    }
+    function closeModal() { document.getElementById('welcomeModal').style.display = 'none'; }
 
-    // Script de atualização de preços (Original)
+    // Slider Logic
+    const slider = document.getElementById('slider');
+    const dotsContainer = document.getElementById('dots');
+    let currentIndex = 0;
+    const totalSlides = 5;
+
+    for (let i = 0; i < totalSlides; i++) {
+        const dot = document.createElement('div');
+        dot.classList.add('dot');
+        if (i === 0) dot.classList.add('active');
+        dotsContainer.appendChild(dot);
+    }
+    const dots = document.querySelectorAll('.dot');
+
     setInterval(() => {
-        const prices = ['btc-price', 'eth-price', 'bnb-price', 'sol-price'];
-        const id = prices[Math.floor(Math.random() * prices.length)];
-        const el = document.getElementById(id);
-        if(!el) return;
-        let val = parseFloat(el.innerText.replace(',', ''));
-        let change = (Math.random() * 2 - 1) * 0.2;
-        el.innerText = (val + change).toLocaleString(undefined, {minimumFractionDigits: 2});
-        el.style.color = change > 0 ? '#00ff88' : '#ff4d4d';
-        setTimeout(() => el.style.color = 'white', 600);
-    }, 2000);
+        currentIndex = (currentIndex + 1) % totalSlides;
+        slider.style.transform = `translateX(-${currentIndex * 20}%)`;
+        dots.forEach(dot => dot.classList.remove('active'));
+        dots[currentIndex].classList.add('active');
+    }, 5000);
 </script>
 {% endblock %}
