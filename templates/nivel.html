@@ -60,7 +60,7 @@
                 <div class="card-footer">
                     {% if level.id in user_levels %}
                         <div class="active-button">
-                            <i class="fas fa-check-double"></i> LICENÇA ATIVA
+                            <i class="fas fa-check-double"></i> PRODUZINDO
                         </div>
                     {% else %}
                         {# FORMULÁRIO ENVIANDO LEVEL_ID PARA SUA VIEW #}
@@ -68,7 +68,7 @@
                             {% csrf_token %}
                             <input type="hidden" name="level_id" value="{{ level.id }}">
                             <button type="submit" class="invest-button">
-                                ADQUIRIR LICENÇA <i class="fas fa-plane-takeoff"></i>
+                                COMPRAR <i class="fas fa-plane-takeoff"></i>
                             </button>
                         </form>
                     {% endif %}
